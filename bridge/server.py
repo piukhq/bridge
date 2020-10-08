@@ -5,6 +5,7 @@ import datetime
 from io import BytesIO
 from flask_session import Session
 from azure.storage.blob import BlobClient
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import Flask, render_template, session, request
 
 from bridge import settings
@@ -15,6 +16,7 @@ application.config.from_object(settings)
 Session(application)
 sso = AzureSSO(application)
 application.jinja_env.globals["now"] = datetime.datetime.utcnow
+application.wsgi_app = ProxyFix(application.wsgi_app, x_proto=1, x_host=1)
 
 
 @application.route("/", methods=["GET", "POST"])

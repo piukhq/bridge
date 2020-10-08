@@ -1,0 +1,18 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+black = "==20.8b1"
+flake8 = "*"
+
+[packages]
+flask = "*"
+azure-storage-blob = "*"
+msal = "*"
+gunicorn = "*"
+flask-session = {editable = true, git = "https://github.com/rayluo/flask-session", ref = "0.3.x"}
+
+[requires]
+python_version = "3.8"

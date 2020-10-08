@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block container %}
+<body>
+    <center>
+        <br>
+        <img src="static/logo.png" alt="Bridge Baby">
+        <br><br><br>
+        <h3>File Upload</h3>
+        <form method="POST" action="" enctype="multipart/form-data">
+            <p><input type="file" name="file"></p>
+            <p><input type="submit" value="Upload"></p>
+        </form>
+    </center>
+</body>
+{% endblock %}

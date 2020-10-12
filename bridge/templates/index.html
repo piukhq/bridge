@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+
+{% block containerclass %}container-fluid{% endblock %}
 {% block container %}
     <div id="app" class="col-md-12">
         <h1>File Upload</h1>
@@ -19,8 +21,7 @@
                 <td><% fileSize(fileitem.file.size) %></td>
                 <td><% fileitem.status %></td>
                 <td>
-                    <a v-if="fileitem.url" v-bind:href="fileitem.url">Link</a>
-                    <button v-if="fileitem.url" class="btn btn-sm btn-link" v-on:click="copyURL(fileitem)"><i class="far fa-copy"></i></button>
+                    <button v-if="fileitem.url" class="btn btn-sm btn-link" v-on:click="copyURL(fileitem)"><i class="far fa-copy"></i> Copy URL</button>
                 </td>
                 <td><button class="btn btn-sm btn-link" v-on:click="removeFile(fileitem)" v-bind:disabled="!!fileitem.url">
                     <i class="fas fa-trash" style="color: #c41d1d"></i></button>
@@ -32,7 +33,7 @@
         <form class="mt-5">
             <div class="form-group">
                 <label for="filedialog" class="btn btn-light"><i class="fas fa-plus-circle"></i> Add file to upload</label>
-                <input type="file" class="form-control-file" id="filedialog" name="file" v-on:change="storeFile" style="display: none;"/>
+                <input type="file" class="form-control-file" id="filedialog" name="file" v-on:change="storeFile" style="display: none;" multiple />
             </div>
             <button type="submit" class="btn btn-primary" v-if="files.length > 0" v-on:click.prevent="uploadFiles"><i class="fas fa-cloud-upload-alt"></i> Upload</button>
         </form>
@@ -59,22 +60,23 @@
             },
             methods: {
                 storeFile: function (e) {
-                    let file = e.target.files[0];
-                    let found = false;
+                    for (let currentFile of e.target.files) {
+                        let found = false;
 
-                    for (let item of this.files) {
-                        if (item.file.name === file.name) {
-                            found = true;
-                            break;
+                        for (let item of this.files) {
+                            if (item.file.name === currentFile.name) {
+                                found = true;
+                                break;
+                            }
                         }
-                    }
 
-                    if (!found) {
-                        this.files.push({
-                            'file': file,
-                            'status': 'Waiting for upload',
-                            'url': '',
-                        });
+                        if (!found) {
+                            this.files.push({
+                                'file': currentFile,
+                                'status': 'Waiting for upload',
+                                'url': '',
+                            });
+                        }
                     }
 
                     // Dodgy hack to remove selected file

@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 black = "==20.8b1"
 flake8 = "*"
+isort = "*"
 
 [packages]
 flask = "*"
@@ -16,4 +17,7 @@ flask-session = {editable = true, git = "https://github.com/rayluo/flask-session
 werkzeug = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true

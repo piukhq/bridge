@@ -2,7 +2,8 @@ import uuid
 from functools import wraps
 
 import msal
-from flask import Flask, session, request, url_for, render_template, redirect, Response
+from flask import (Flask, Response, redirect, render_template, request,
+                   session, url_for)
 
 
 class AzureSSO(object):
@@ -68,7 +69,7 @@ class AzureSSO(object):
                     session["state"] = str(uuid.uuid4())
                     if api:
                         return Response(
-                            response='{"error": "Unauthenticated"}', status=400, mimetype="application/json"
+                            response='{"error": "Unauthenticated"}', status=401, mimetype="application/json"
                         )
                     return redirect(self.build_auth_url(scopes=[], state=session["state"]))
                 return f(*args, **kwargs)

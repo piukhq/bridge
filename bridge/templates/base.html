@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="h-100">
 <head>
 {% block head %}
     <meta charset="utf-8">
     <title>Bridge - Barclays Upload Tool</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" href="https://bink.com/apple-touch-icon.png" sizes="180x180">
@@ -16,22 +16,35 @@
     <link rel="icon" href="https://bink.com/wp-content/uploads/2018/05/favicon.png">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
+
+    <style>
+    .container {
+  width: auto;
+  max-width: 680px;
+  padding: 0 15px;
+}
+
+.footer {
+  background-color: #f5f5f5;
+}
+    </style>
 {% endblock %}
 </head>
-<body>
+<body class="d-flex flex-column h-100">
 <header>
     <!-- Fixed navbar -->
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-        <a class="navbar-brand" href="/">Bridge</a>
+        <a class="navbar-brand" href="/">
+            <img src="static/logo.png" width="20" height="20" alt="Bridge Baby">
+            Bridge
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-                </li>
+
             </ul>
             <span class="navbar-text">
                 <i class="fas fa-user"></i> {{ user.get("name") }}
@@ -41,25 +54,27 @@
 </header>
 
 <!-- Begin page content -->
-<main role="main" class="{% block containerclass %}container{% endblock %}">
-    {% block container %}
-        <h1 class="mt-5">Sticky footer with fixed navbar</h1>
-        <p class="lead">Pin a footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A
-            fixed navbar has been added with <code>padding-top: 60px;</code> on the <code>main &gt; .container</code>.
-        </p>
-        <p>Back to <a href="/docs/4.5/examples/sticky-footer/">the default sticky footer</a> minus the navbar.</p>
-    {% endblock %}
+<main role="main" class="flex-shrink-0 mt-3">
+    <div class="{% block containerclass %}container{% endblock %}">
+        {% block container %}
+            <h1 class="mt-5">Sticky footer with fixed navbar</h1>
+            <p class="lead">Pin a footer to the bottom of the viewport in desktop browsers with this custom HTML and CSS. A
+                fixed navbar has been added with <code>padding-top: 60px;</code> on the <code>main &gt; .container</code>.
+            </p>
+            <p>Back to <a href="/docs/4.5/examples/sticky-footer/">the default sticky footer</a> minus the navbar.</p>
+        {% endblock %}
+    </div>
 </main>
 
-<footer class="footer">
-    <div class="container">
+<footer class="footer mt-auto py-3">
+    <div class="container-fluid">
         <span class="text-muted">&copy; Copyright Bink {{ now().year }}</span>
     </div>
 </footer>
 {% block script %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" integrity="sha256-KzZiKy0DWYsnwMF+X1DvQngQ2/FxF7MF3Ff72XcpuPs=" crossorigin="anonymous"></script>
 {% endblock %}
 </body>

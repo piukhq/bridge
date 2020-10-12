@@ -1,12 +1,12 @@
-import os
-import string
-import random
 import datetime
-from io import BytesIO
-from flask_session import Session
+import os
+import random
+import string
+
 from azure.storage.blob import BlobClient
+from flask import Flask, jsonify, render_template, request, session
+from flask_session import Session
 from werkzeug.middleware.proxy_fix import ProxyFix
-from flask import Flask, render_template, session, request
 
 from bridge import settings
 from bridge.azure_sso import AzureSSO
@@ -25,23 +25,42 @@ def index():
     ctx = {
         "user": session["user"],
     }
-    if request.method == "GET":
-        return render_template("index.html", **ctx)
-    if request.method == "POST":
-        uploaded_file = request.files["file"]
-        if uploaded_file.filename != "":
-            bits = "".join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=6))
-            split = os.path.splitext(uploaded_file.filename)
-            blob_name = f"{split[0]}-{bits}{split[1]}"
-            blob = BlobClient.from_connection_string(
-                conn_str=settings.CONNECTION_STRING, container_name="bridge", blob_name=blob_name
-            )
-            buffer = BytesIO()
-            uploaded_file.save(buffer)
-            buffer.seek(0)
-            blob.upload_blob(buffer)
-        return render_template("upload.html", blob_name=blob.url, **ctx)
+    return render_template("index.html", **ctx)
 
 
-# @application.route("/statics")
-# def statics():
+@application.route("/api/v1/upload", methods=["POST"])
+@sso.login_required(api=True)
+def upload_file():
+    uploaded_file = request.files.get("file")
+
+    if not uploaded_file:
+        return jsonify({"error": "missing uploaded file called 'file'"}), 400
+
+    filename = uploaded_file.filename.strip()
+
+    if not filename:
+        return jsonify({"error": "Uploaded file missing filename"}), 400
+
+    bits = "".join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=6))
+    filename_part, filename_ext = os.path.splitext(uploaded_file.filename)
+    filename_part = filename_part.strip()
+    blob_name = f"{filename_part}-{bits}{filename_ext}"
+    blob = BlobClient.from_connection_string(
+        conn_str=settings.CONNECTION_STRING, container_name="bridge", blob_name=blob_name
+    )
+    blob.upload_blob(uploaded_file.stream)
+    return jsonify({"url": blob.url}), 200
+
+
+@application.route("/livez", methods=["GET"])
+def livez():
+    return "", 200
+
+
+@application.route("/readyz", methods=["GET"])
+def readyz():
+    return "", 200
+
+
+if __name__ == "__main__":
+    application.run(port=8000, debug=False)

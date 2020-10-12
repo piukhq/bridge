@@ -1,15 +1,147 @@
 {% extends "base.html" %}
 {% block container %}
-<body>
-    <center>
-        <br>
-        <img src="static/logo.png" alt="Bridge Baby">
-        <br><br><br>
-        <h3>File Upload</h3>
-        <form method="POST" action="" enctype="multipart/form-data">
-            <p><input type="file" name="file"></p>
-            <p><input type="submit" value="Upload"></p>
+    <div id="app" class="col-md-12">
+        <h1>File Upload</h1>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">File</th>
+                <th scope="col">Size</th>
+                <th scope="col">Status</th>
+                <th scope="col">URL</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="fileitem in files">
+                <td><% fileitem.file.name %></td>
+                <td><% fileSize(fileitem.file.size) %></td>
+                <td><% fileitem.status %></td>
+                <td>
+                    <a v-if="fileitem.url" v-bind:href="fileitem.url">Link</a>
+                    <button v-if="fileitem.url" class="btn btn-sm btn-link" v-on:click="copyURL(fileitem)"><i class="far fa-copy"></i></button>
+                </td>
+                <td><button class="btn btn-sm btn-link" v-on:click="removeFile(fileitem)" v-bind:disabled="!!fileitem.url">
+                    <i class="fas fa-trash" style="color: #c41d1d"></i></button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <form class="mt-5">
+            <div class="form-group">
+                <label for="filedialog" class="btn btn-light"><i class="fas fa-plus-circle"></i> Add file to upload</label>
+                <input type="file" class="form-control-file" id="filedialog" name="file" v-on:change="storeFile" style="display: none;"/>
+            </div>
+            <button type="submit" class="btn btn-primary" v-if="files.length > 0" v-on:click.prevent="uploadFiles"><i class="fas fa-cloud-upload-alt"></i> Upload</button>
         </form>
-    </center>
-</body>
+    </div>
 {% endblock %}
+
+
+{% block script %}
+    {{ super() }}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"
+            integrity="sha384-ma9ivURrHX5VOB4tNq+UiGNkJoANH4EAJmhxd1mmDq0gKOv88wkKZOfRDOpXynwh"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"
+            integrity="sha384-2XOZivYbqb8tFabKgnwAzzK83I/YRbbn0VloViPRrAT2AGg4Qo2pmG1XrkkCXNpo"
+            crossorigin="anonymous"></script>
+
+    <script type="application/javascript">
+
+        const app = new Vue({
+            el: '#app',
+            delimiters: ['<%', '%>'],  // Good old asp tags
+            data: {
+                files: []
+            },
+            methods: {
+                storeFile: function (e) {
+                    let file = e.target.files[0];
+                    let found = false;
+
+                    for (let item of this.files) {
+                        if (item.file.name === file.name) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        this.files.push({
+                            'file': file,
+                            'status': 'Waiting for upload',
+                            'url': '',
+                        });
+                    }
+
+                    // Dodgy hack to remove selected file
+                    $('#filedialog').val('');
+                },
+                removeFile: function(item) {
+                    let index = this.files.indexOf(item);
+                    if (index > -1) {
+                        this.files.splice(index, 1);
+                    }
+                },
+                copyURL: function (item) {
+                    let dummy = document.createElement("textarea");
+                    document.body.appendChild(dummy);
+                    dummy.value = item.url;
+                    dummy.select();
+                    //copyText.setSelectionRange(0, 99999);
+                    document.execCommand("copy");
+                    document.body.removeChild(dummy);
+                },
+                fileSize: function(a) {
+                    let e = Math.log(a) / Math.log(1024) | 0;
+                    let num = (a / Math.pow(1024, e)).toFixed(2);
+
+                    return num + ' ' + (e?'KMGTPEZY'[--e]+'B':'Bytes');
+                },
+                uploadFiles: async function() {
+                    for (let fileitem of this.files) {
+                        if (fileitem.url.length > 0) {
+                            continue;
+                        }
+
+                        try {
+                            let formData = new FormData();
+                            formData.append('file', fileitem.file);
+
+                            let response = await axios.post("/api/v1/upload", formData,  {
+                                onUploadProgress: function(progressEvent) {
+                                    let progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                                    if (progress === 100) {
+                                        fileitem.status = 'Generating URL';
+                                    } else {
+                                        fileitem.status = 'Uploading (' + progress + '%)';
+                                    }
+                                }
+                            });
+
+                            if (response.status !== 200) {
+                                fileitem.status = "Unknown error occured";
+                                console.warn(`Unknown status code ${response.status}`);
+                                console.log(response);
+                            } else {
+                                fileitem.status = "Uploaded";
+                                fileitem.url = response.data.url;
+                            }
+
+                        } catch (e) {
+                            fileitem.status = "Unknown error occured";
+                            console.error(e);
+                        }
+                    }
+                }
+            }
+
+        })
+
+    </script>
+
+{% endblock %}
+

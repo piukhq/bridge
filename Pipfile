@@ -14,7 +14,9 @@ azure-storage-blob = "*"
 msal = "*"
 gunicorn = "*"
 flask-session = {editable = true, git = "https://github.com/rayluo/flask-session", ref = "0.3.x"}
-werkzeug = "*"
+werkzeug = "==1.0.1"
+flask-caching = "==1.9.0"
+markupsafe = "<2.1"
 
 [requires]
 python_version = "3.10"

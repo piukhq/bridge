@@ -2,8 +2,7 @@ import uuid
 from functools import wraps
 
 import msal
-from flask import (Flask, Response, redirect, render_template, request,
-                   session, url_for)
+from flask import Flask, Response, redirect, render_template, request, session, url_for
 
 
 class AzureSSO(object):

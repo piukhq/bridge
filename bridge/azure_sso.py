@@ -1,3 +1,5 @@
+"""Module used to authenticate users using Azure Active Directory."""
+
 import uuid
 from functools import wraps
 
@@ -5,19 +7,18 @@ import msal
 from flask import Flask, Response, redirect, render_template, request, session, url_for
 
 
-class AzureSSO(object):
-    def __init__(
-        self,
-        app: Flask,
-    ):
+class AzureSSO:
+    """Class is used to authenticate users using Azure Active Directory."""
 
+    def __init__(self, app: Flask) -> None:
+        """Initialize the AzureSSO class."""
         self._redirect_path = app.config["REDIRECT_PATH"]
         self._config_authority = app.config["AUTHORITY"]
         self._client_id = app.config["CLIENT_ID"]
         self.__client_secret = app.config["CLIENT_SECRET"]
 
         @app.route(self._redirect_path)
-        def authorized():
+        def authorized() -> None:
             if request.args.get("state") != session.get("state"):
                 return redirect(url_for("index"))  # No-OP. Goes back to Index page
             if "error" in request.args:  # Authentication/Authorization failure
@@ -36,18 +37,18 @@ class AzureSSO(object):
             return redirect(url_for("index"))
 
     @staticmethod
-    def _load_cache():
+    def _load_cache() -> None:
         cache = msal.SerializableTokenCache()
         if session.get("token_cache"):
             cache.deserialize(session["token_cache"])
         return cache
 
     @staticmethod
-    def _save_cache(cache):
+    def _save_cache(cache: None) -> None:
         if cache.has_state_changed:
             session["token_cache"] = cache.serialize()
 
-    def _build_msal_app(self, cache=None, authority=None):
+    def _build_msal_app(self, cache:None=None, authority:None=None) -> None:
         return msal.ConfidentialClientApplication(
             self._client_id,
             authority=authority or self._config_authority,
@@ -55,12 +56,14 @@ class AzureSSO(object):
             token_cache=cache,
         )
 
-    def build_auth_url(self, authority=None, scopes=None, state=None):
+    def build_auth_url(self, authority=None, scopes=None, state=None) -> None:
+        """Build the authentication URL."""
         return self._build_msal_app(authority=authority).get_authorization_request_url(
             scopes or [], state=state or str(uuid.uuid4()), redirect_uri=url_for("authorized", _external=True)
         )
 
-    def login_required(self, api: bool = False):
+    def login_required(self, api: bool = False) -> None:
+        """Decorator to wrap routes with authentication."""
         def _d(f):
             @wraps(f)
             def _w(*args, **kwargs):

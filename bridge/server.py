@@ -1,3 +1,5 @@
+"""Main entrypoint for the application."""
+
 import datetime
 import os
 import random
@@ -21,7 +23,8 @@ application.wsgi_app = ProxyFix(application.wsgi_app, x_proto=1, x_host=1)
 
 @application.route("/", methods=["GET", "POST"])
 @sso.login_required()
-def index():
+def index() -> None:
+    """Index page for the application."""
     ctx = {
         "user": session["user"],
     }
@@ -30,7 +33,8 @@ def index():
 
 @application.route("/api/v1/upload", methods=["POST"])
 @sso.login_required(api=True)
-def upload_file():
+def upload_file() -> None:
+    """Upload a file to Azure Blob Storage."""
     uploaded_file = request.files.get("file")
 
     if not uploaded_file:
@@ -53,12 +57,14 @@ def upload_file():
 
 
 @application.route("/livez", methods=["GET"])
-def livez():
+def livez() -> int:
+    """Health check for the application."""
     return "", 200
 
 
 @application.route("/readyz", methods=["GET"])
-def readyz():
+def readyz() -> int:
+    """Readiness check for the application."""
     return "", 200
 
 

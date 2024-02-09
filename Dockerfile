@@ -4,6 +4,7 @@ WORKDIR /app
 ADD . .
 
 RUN apt-get update && apt-get -y install git && \
+    pip install pipenv && \
     pipenv install --system --deploy --ignore-pipfile && \
     apt-get -y autoremove git && rm -rf /var/lib/apt/lists
 

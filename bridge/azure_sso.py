@@ -48,7 +48,7 @@ class AzureSSO:
         if cache.has_state_changed:
             session["token_cache"] = cache.serialize()
 
-    def _build_msal_app(self, cache:None=None, authority:None=None) -> None:
+    def _build_msal_app(self, cache: None = None, authority: None = None) -> None:
         return msal.ConfidentialClientApplication(
             self._client_id,
             authority=authority or self._config_authority,
@@ -62,11 +62,12 @@ class AzureSSO:
             scopes or [], state=state or str(uuid.uuid4()), redirect_uri=url_for("authorized", _external=True)
         )
 
-    def login_required(self, api: bool = False) -> None:
-        """Decorator to wrap routes with authentication."""
-        def _d(f):
+    def login_required(self, api: bool = False) -> None:  # noqa: FBT001, FBT002
+        """Wrap routes with authentication with this decorator."""
+
+        def _d(f) -> None:
             @wraps(f)
-            def _w(*args, **kwargs):
+            def _w(*args, **kwargs) -> None:  # noqa: ANN002, ANN003
                 if not session.get("user"):
                     session["state"] = str(uuid.uuid4())
                     if api:

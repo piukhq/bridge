@@ -46,7 +46,7 @@ def upload_file() -> None:
         return jsonify({"error": "Uploaded file missing filename"}), 400
 
     bits = "".join(random.choices(string.ascii_uppercase + string.ascii_lowercase + string.digits, k=6))
-    filename_part, filename_ext = os.path.splitext(uploaded_file.filename)
+    filename_part, filename_ext = os.path.splitext(uploaded_file.filename)  # noqa: PTH122
     filename_part = filename_part.strip()
     blob_name = f"{filename_part}-{bits}{filename_ext}"
     blob = BlobClient.from_connection_string(
